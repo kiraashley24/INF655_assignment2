@@ -1,25 +1,74 @@
-import logo from './logo.svg';
 import './App.css';
+import React, { useState } from 'react';
+import Items from './components/Items';
+import ItemDescript from './components/ItemDescript';
+import AddItem from './components/AddItem';
 
-function App() {
+const App = () => {
+  const [items, setItems] = useState(ItemDescript);
+  const [filter, setFilter] = useState('all'); 
+
+  const handleCheck = (id) => {
+    const updatedItems = items.map((item) =>
+      item.id === id ? { ...item, checked: !item.checked } : item
+    );
+    setItems(updatedItems);
+  };
+
+  const handleDelete = (id) => {
+    const updatedItems = items.filter((item) => item.id !== id);
+    setItems(updatedItems);
+  };
+
+  const handleAddItem = ({ title, description }) => {
+    const newItem = {
+      id: items.length + 1,
+      title,
+      description,
+      checked: false,
+    };
+    setItems([...items, newItem]);
+  };
+
+  const handleEdit = (id, title, description) => {
+    const updatedItems = items.map((item) =>
+      item.id === id ? { ...item, title, description } : item
+    );
+    setItems(updatedItems);
+  };
+
+  const filteredItems = items.filter((item) => {
+    if (filter === 'completed') {
+      return item.checked;
+    } else if (filter === 'incomplete') {
+      return !item.checked;
+    } else {
+      return true;
+    }
+  });
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Today's Chore List</h1>
+      <div className="card">
+        <div className="card-body">
+          <h2>Add New Chore</h2>
+          <AddItem onAddItem={handleAddItem} />
+        </div>
+      </div>
+      <div>
+        <label>
+          Filter: 
+          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+            <option value="all">All Chores</option>
+            <option value="completed">Completed Chores</option>
+            <option value="incomplete">Incomplete Chores</option>
+          </select>
+        </label>
+      </div>
+      <Items items={filteredItems} onCheck={handleCheck} onDelete={handleDelete} onEdit={handleEdit} />
     </div>
   );
-}
+};
 
 export default App;
