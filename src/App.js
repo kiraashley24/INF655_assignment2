@@ -1,12 +1,19 @@
 import './App.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Items from './components/Items';
 import ItemDescript from './components/ItemDescript';
 import AddItem from './components/AddItem';
 
 const App = () => {
-  const [items, setItems] = useState(ItemDescript);
-  const [filter, setFilter] = useState('all'); 
+  const [items, setItems] = useState(() => {
+    const savedItems = localStorage.getItem('items');
+    return savedItems ? JSON.parse(savedItems) : ItemDescript;
+  });
+  const [filter, setFilter] = useState('all');
+
+  useEffect(() => {
+    localStorage.setItem('items', JSON.stringify(items));
+  }, [items]);
 
   const handleCheck = (id) => {
     const updatedItems = items.map((item) =>
@@ -58,7 +65,7 @@ const App = () => {
       </div>
       <div>
         <label>
-          Filter: 
+          Filter:
           <select value={filter} onChange={(e) => setFilter(e.target.value)}>
             <option value="all">All Chores</option>
             <option value="completed">Completed Chores</option>
